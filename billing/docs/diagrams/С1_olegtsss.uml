@@ -1,0 +1,29 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+header Компонентная диаграмма сервиса
+title Billing Service
+footer Страница 1 из 1
+
+actor Клиент
+component Billing as "Billing API"
+component Yapay as "Yapay провайдер"
+component Yookassa as "Yookassa провайдер"
+component Eventbus
+
+database Redis
+database Postgres as "База данных Billing"
+
+Клиент -right-> Billing: представляется посредство JWT token-а
+Клиент <-right- Billing: обогащение JWT token-а
+Billing <-up-> Yookassa: Получение payment_link + callback о платеже
+Billing <-down-> Yapay: Получение payment_link + callback о платеже
+Клиент -up-> Yookassa: Платеж по payment_link
+Клиент -down-> Yapay: Платеж по payment_link
+Billing -right-> Eventbus: Очередь проверки оплат
+Billing <-down-> Postgres: Plan, Order, Payment,\nRefund, Subscription,\nSubscription Event
+Billing <-up-> Redis
+
+@enduml

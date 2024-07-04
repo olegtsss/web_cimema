@@ -1,0 +1,27 @@
+@startuml
+
+actor       Client
+participant Billing
+participant YaPay
+
+group Create payment link
+
+  Client -> Billing : Wanna by sub
+  Billing -> YaPay : Give a payment link
+  YaPay -> Billing : Here you are
+  Billing -> Client : Go here and pay for sub
+  YaPay -> Billing : The order: paid, failed or link has expired
+
+end
+
+
+group Cancel sub
+
+  Client -> Billing : Wanna cancel sub
+  Billing -> YaPay : Cancel recur order
+  YaPay -> Billing : Done
+  Billing -> Client : Done
+
+end
+
+@enduml

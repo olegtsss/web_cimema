@@ -1,0 +1,91 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+header Компонентная диаграмма сервиса Notification
+title Компонентная диаграмма сервиса Notification
+footer Страница 1 из 1
+
+actor Администратор
+actor Users
+actor User
+
+component Generator as "Генератор уведомлений"
+component API as "API"
+component API_2 as "API: \n\n1) Ручка получения события\n2) Ручка отдачи статуса события \n3) Ручка отдачи всех шаблонов"
+component Audiense as "Audiense consumer"
+component Auth as "Auth сервис"
+component Sheduler as "Sheduler consumer"
+component Worker
+
+database Database as "База данных: \n\n1) Nested уведомления\n2) Шаблоны уведомлений \n\n Разрешены: get и insert"
+
+component Queue_1
+component Queue_2
+component Queue_3
+component DLQ as "Dead letter queue"
+
+Generator -> API: Событие
+Администратор -down-> API: Событие
+Users -up-> API: Событие
+API -right-> Queue_1: 1) генерация уведомления\n2) первичная валидация\nшаблона и переменных\n3) загрузка в очереди\n(scheduled или instant)\n4) лог события в базу\n
+Queue_1 -right-> Audiense: Nested\nуведомление
+Audiense -right-> Queue_2: Nested\nуведомление
+Audiense -up-> Auth: user_id
+Queue_2 -right-> Sheduler: Nested\nуведомление
+Sheduler -right-> Queue_3: Nested\nуведомление\nwith TTL
+Queue_3 -up-> DLQ
+DLQ -right-> Worker: Отправка Nested\nуведомления
+Worker -right-> User: Email \ websockets
+
+note top of Generator
+    1) Генерировать общие scheduled уведомления,
+    (недельная подборка фильмов)
+    2) Генерировать персональные уведомления
+    (письмо со статистикой активным
+    пользователям в конце месяца)
+end note
+
+note top of Администратор
+    1) Отправить уведомление одному пользователю
+    2) Отправить уведомление всем пользователям
+end note
+
+note bottom of Users
+    Уведомления, инициированные
+    пользователем (welcome email)
+end note
+
+note bottom of Audiense
+    1) Уточняет разрешена ли отправка уведомлений пользователю
+    2) Рассчет времени отправки уведомления
+    3) Логирует события в базу
+end note
+
+note bottom of Sheduler
+    1) Рассчитывает TTL для каждого уведомления
+    2) Логирует события в базу
+end note
+
+note bottom of Queue_3
+    1) Хранит уведомления до истечения TTL
+    2) Устаревшие уведомления помещает в
+    Dead letter queue, тем самым являясь
+    планировщиком
+end note
+
+note bottom of Worker
+    1) Получает сообщения из scheduled и instant очередей
+    2) Обогащает данными от сервиса Auth по user_id
+    3) Повторно валидирует шаблон и переменные
+    4) Логирует события в базу
+end note
+
+note top of Auth
+    1) Ручка user_id -> user_email (для Worker)
+    2) Ручка user_id -> user_timezone (для Audiense)
+    3) Ручка user_id -> user_allow_notification (для Audiense)
+end note
+
+@enduml

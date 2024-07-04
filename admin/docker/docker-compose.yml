@@ -1,0 +1,75 @@
+version: '3'
+services:
+
+  db:
+    build:
+      dockerfile: Dockerfile_postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_database:/var/lib/postgresql/data/
+  
+  service:
+    build:
+      context: movies_admin/
+      dockerfile: Dockerfile_app
+    expose:
+      - "8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - static_value:/opt/app/static/
+    command:
+      - /bin/sh
+      - -c
+      - |
+        sleep 3
+        python sqlite_to_postgres/create_schema.py || true
+        python manage.py migrate || true
+        python manage.py createsuperuser --noinput || true
+        python manage.py collectstatic --no-input || true
+        python manage.py compilemessages -l en -l ru || true
+        cd sqlite_to_postgres/ && python load_data.py && cd .. || true
+        uwsgi --strict --ini uwsgi.ini
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs:/etc/nginx/conf.d:ro
+      - ./data:/data/:ro
+      - static_value:/var/html/static/
+    depends_on:
+      - service
+    ports:
+      - "80:80"
+
+  elasticsearch:
+    image: elasticsearch:8.6.2
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch_data:/opt/elasticsearch/data
+    ports:
+      - "127.0.0.1:9200:9200"
+    env_file:
+      - .env
+    depends_on:
+      - service
+
+  elasticsearch_worker:
+    build:
+      context: etl/
+      dockerfile: Dockerfile_etl
+    env_file:
+      - .env
+    depends_on:
+      - elasticsearch
+
+volumes:
+  static_value:
+  postgres_database:
+  elasticsearch_data:

@@ -1,0 +1,26 @@
+services:
+  rabbit1:
+    image: rabbitmq:3.12-management
+    hostname: rabbit1
+    container_name: rabbit1
+    ports:
+      - 5672:5672
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "secretcookie"
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit clusterer_type disc"
+
+  rabbit2:
+    image: rabbitmq:3.12-management
+    hostname: rabbit2
+    container_name: rabbit2
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "secretcookie"
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit clusterer_type disc"
+
+  rabbit3:
+    image: rabbitmq:3.12-management
+    hostname: rabbit3
+    container_name: rabbit3
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "secretcookie"
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit clusterer_type disc"

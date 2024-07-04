@@ -1,0 +1,59 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+title С2 "to be" microservices diagram
+
+actor User
+actor AdminUser
+actor AnalystUser
+
+
+package AdminPanel {
+  component Panel
+  database AdminDatabase
+}
+
+package Practix {
+  component PractixAPI
+  database SearchEngine
+
+  package ETL {
+    component ETLService
+    database StateStorage
+  }
+}
+
+package UMS {
+  component API
+  database Database
+}
+
+package UGC {
+  component UGCAPI
+  database OLAPStorage
+  database NoSQLStorage
+}
+
+
+AdminUser -right-> Panel : Manage movies data
+User -left-> PractixAPI : Get movies data
+User -right-> API : Manage user data and access
+User -down-> UGCAPI : Manage generated content
+AnalystUser -up-> OLAPStorage : Analysis of generated content
+
+Panel --> AdminDatabase
+
+PractixAPI --> SearchEngine
+
+ETLService --> StateStorage : Manage states
+ETLService -up-> AdminDatabase : Get movies data
+ETLService -up-> SearchEngine : Load movies data
+
+API --> Database
+
+UGCAPI --> OLAPStorage
+UGCAPI --> NoSQLStorage
+
+@enduml

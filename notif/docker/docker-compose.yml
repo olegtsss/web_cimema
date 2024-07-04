@@ -1,0 +1,88 @@
+volumes:
+  pg_volume:
+  rd_volume:
+  rb_volume:
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - 5432:5432
+    env_file: ../.env
+    volumes:
+      - ../src/storages/dump:/docker-entrypoint-initdb.d:ro
+      - pg_volume:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - 6379:6379
+    env_file: ../.env
+    volumes:
+      - rd_volume:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  rabbit:
+    image: rabbitmq:3.12-management
+    container_name: rabbit
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file: ../.env
+    volumes:
+      - rb_volume:/var/lib/rabbitmq/mnesia
+    restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api:
+    image: python:3.10
+    container_name: api
+    working_dir: /opt/api
+    ports:
+      - 5000:5000
+    env_file: ../.env
+    volumes:
+      - ../src:/opt/api
+    entrypoint: >
+      bash -c "pip install -r requirements.txt && gunicorn main:app -c gunicorn.conf.py"
+
+  sheduler:
+    image: python:3.10
+    container_name: sheduler
+    working_dir: /opt/sheduler
+    env_file: ../.env
+    volumes:
+      - ../src:/opt/sheduler
+    entrypoint: >
+      bash -c "pip install -r requirements.txt && export PYTHONPATH=/opt/sheduler && python3 sheduler/sheduler.py"
+    depends_on:
+      - api
+
+  worker:
+    image: python:3.10
+    container_name: worker
+    working_dir: /opt/worker
+    env_file: ../.env
+    volumes:
+      - ../src:/opt/worker
+    entrypoint: >
+      bash -c "pip install -r requirements.txt && export PYTHONPATH=/opt/worker && python3 worker/worker.py"
+    depends_on:
+      - api

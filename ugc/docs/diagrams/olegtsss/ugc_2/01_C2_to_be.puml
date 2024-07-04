@@ -1,0 +1,31 @@
+@startuml
+
+header Компонентная диаграмма
+title UGC
+footer Страница 1 из 1
+
+actor               Пользователь
+participant         Frontend
+participant         API
+participant         EventBus
+participant         Etl
+database            MongoDB
+database            Clickhouse
+actor               Аналитик
+
+Пользователь <-> Frontend
+Frontend -> API : Оценка
+Frontend -> API : Рецензия
+Frontend -> API : Отложить \nфильм
+API -> EventBus : Загрузка
+EventBus -> Etl : Выгрузка
+Etl -> MongoDB : Extract \nTransform \nLoad
+Etl -> Clickhouse : Extract \nTransform \nLoad
+MongoDB -> API
+API -> Frontend : Оценка
+API -> Frontend : Средняя оценка
+API -> Frontend : Рецензия
+API -> Frontend : Отложен
+Clickhouse <-> Аналитик
+
+@enduml

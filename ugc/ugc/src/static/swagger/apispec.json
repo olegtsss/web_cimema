@@ -1,0 +1,1324 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "definitions": {
+    "BaseEvent": {
+      "properties": {
+        "payload": {
+          "description": "Payload of the event",
+          "type": "object"
+        },
+        "session_id": {
+          "description": "ID of the session",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL of the event",
+          "example": "https://practix.ru/page",
+          "format": "uri",
+          "type": "string"
+        },
+        "user_ts": {
+          "description": "User timestamp",
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "user_ts",
+        "url"
+      ],
+      "type": "object"
+    },
+    "ChangeQualityEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/ChangeQualityPayload"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "ChangeQualityPayload": {
+      "allOf": [
+        {
+          "properties": {
+            "next_quality": {
+              "description": "Next quality of the film",
+              "type": "string"
+            },
+            "previous_quality": {
+              "description": "Previous quality of the film",
+              "type": "string"
+            }
+          },
+          "required": [
+            "previous_quality",
+            "next_quality"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ClickEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/ClickPayload"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "ClickPayload": {
+      "properties": {
+        "element_id": {
+          "description": "ID of the clicked element",
+          "type": "string"
+        },
+        "element_payload": {
+          "description": "Payload data associated with the clicked element",
+          "type": "string"
+        }
+      },
+      "required": [
+        "element_id",
+        "element_payload"
+      ],
+      "type": "object"
+    },
+    "CreateUserBookmarkEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        }
+      ]
+    },
+    "CreateFilmRatingEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmRatingPayload"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "CreateFilmRatingPayload": {
+      "allOf": [
+        {
+          "properties": {
+            "value": {
+              "description": "Rating from 0 to 10",
+              "format": "int64",
+              "maximum": 10,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CreateFilmReviewEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmReviewPayload"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "CreateFilmReviewPayload": {
+      "allOf": [
+        {
+          "properties": {
+            "value": {
+              "description": "This film is awesome! I ...",
+              "type": "string"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CreateFilmReviewRatingEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmReviewRatingPayload"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "CreateFilmReviewRatingPayload": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/RatingPayload"
+        }
+      ]
+    },
+    "DeleteUserBookmarkEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        }
+      ]
+    },
+    "DeleteFilmRatingEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" }
+      ]
+    },
+    "DeleteFilmReviewEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        }
+      ]
+    },
+    "DeleteFilmReviewRatingEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" }
+      ]
+    },
+    "UpdateFilmRatingEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmRatingPayload"
+            }
+          },
+          "required": ["payload"]
+        }
+      ]
+    },
+    "UpdateFilmReviewEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmReviewPayload"
+            }
+          },
+          "required": [
+            "payload"
+          ]
+        }
+      ]
+    },
+    "UpdateFilmReviewRatingEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "$ref": "#/definitions/CreateFilmReviewRatingPayload"
+            }
+          },
+          "required": ["payload"]
+        }
+      ]
+    },
+    "FilmIdPayload": {
+      "properties": {
+        "film_id": {
+          "description": "ID of the film",
+          "format": "uuid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "film_id"
+      ],
+      "type": "object"
+    },
+    "FullyWatchEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        }
+      ]
+    },
+    "RatingPayload": {
+      "properties": {
+        "value": {
+          "description": "Rating from 0 to 10",
+          "format": "int64",
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
+    "VisitEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEvent"
+        }
+      ]
+    }
+  },
+  "info": {
+    "title": "UGC",
+    "version": "0.1.0"
+  },
+  "parameters": {
+    "XRequestId": {
+      "in": "header",
+      "name": "X-Request-Id",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "paths": {
+    "/api/v1/events/click": {
+      "post": {
+        "description": "Ручка создания события типа \"клик\".",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/ClickEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Click",
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/v1/events/exception": {
+      "post": {
+        "description": "Искусственное возбуждение исключения внутри роута.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Exception",
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/v1/films/{film_id}/fully_watched": {
+      "post": {
+        "description": "Ручка создания события типа \"просмотрено полностью\".",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/FullyWatchEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Fully Watched",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/{film_id}/quality_changed": {
+      "post": {
+        "description": "Ручка создания события типа \"смена качества\".",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/ChangeQualityEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Quality Changed",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/events/visit": {
+      "post": {
+        "description": "Ручка создания события типа \"визит\".",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/VisitEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Visit",
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/v1/films/{film_id}/rating": {
+      "delete": {
+        "description": "Ручка создания события типа \"рейтинг произведения\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/DeleteFilmRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film rating event",
+        "tags": [
+          "films"
+        ]
+      },
+      "get": {
+        "description": "Ручка получения лайков, дизлайков, средней оценки произведения.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/FilmRatingResponse"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Get film rating",
+        "tags": [
+          "films"
+        ]
+      },
+      "patch": {
+        "description": "Ручка создания события типа \"рейтинг произведения\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/UpdateFilmRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film rating event",
+        "tags": [
+          "films"
+        ]
+      },
+      "post": {
+        "description": "Ручка создания события типа \"рейтинг произведения\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/CreateFilmRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film rating event",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/{film_id}/reviews": {
+      "get": {
+        "description": "Ручка получения отзывов (рецензий) на произведения.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/FilmReviewListResponse"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Get film reviews",
+        "tags": [
+          "films"
+        ]
+      },
+      "post": {
+        "description": "Ручка создания события типа \"отзыв (рецензия) на произведение\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/CreateFilmReviewEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film review event",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/reviews/{review_id}": {
+      "delete": {
+        "description": "Ручка создания события типа \"отзыв (рецензия) на произведение\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/DeleteFilmReviewEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film review event",
+        "tags": [
+          "films"
+        ]
+      },
+      "patch": {
+        "description": "Ручка создания события типа \"отзыв (рецензия) на произведение\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/UpdateFilmReviewEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Process film review event",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/reviews/{review_id}/rating": {
+      "delete": {
+        "description": "Ручка создания события типа \"оценка отзыва (рецензии)\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/DeleteFilmReviewRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Proccess film review rating event",
+        "tags": [
+          "films"
+        ]
+      },
+      "patch": {
+        "description": "Ручка создания события типа \"оценка отзыва (рецензии)\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/UpdateFilmReviewRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Proccess film review rating event",
+        "tags": [
+          "films"
+        ]
+      },
+      "post": {
+        "description": "Ручка создания события типа \"оценка отзыва (рецензии)\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/CreateFilmReviewRatingEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Proccess film review rating event",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/bookmarks": {
+      "get": {
+        "description": "Ручка получения пользовательских закладок.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/UserBookmarkResponseList"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Get user bookmarks",
+        "tags": [
+          "films"
+        ]
+      }
+    },
+    "/api/v1/films/{film_id}/bookmarks": {
+      "delete": {
+        "description": "Ручка создания события типа \"пользовательская закладка\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/DeleteUserBookmarkEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Proccess user bookmark event",
+        "tags": [
+          "films"
+        ]
+      },
+      "post": {
+        "description": "Ручка создания события типа \"пользовательская закладка\". Тип события определяется типом запроса, где POST - создание, PATCH - обновление, DELETE - удаление.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/XRequestId",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "format": "uuid",
+            "in": "path",
+            "name": "film_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "event",
+            "schema": {
+              "$ref": "#/definitions/CreateUserBookmarkEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "Proccess user bookmark event",
+        "tags": [
+          "films"
+        ]
+      }
+    }
+  },
+  "produces": [
+    "application/json"
+  ],
+  "responses": {
+    "BadRequest": {
+      "description": "Bad Request",
+      "schema": {
+        "properties": {
+          "error": {
+            "enum": [
+              "Header X-Request-Id not specified"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "FilmRatingResponse": {
+      "description": "Ok",
+      "schema": {
+        "properties": {
+          "avg_rating": {
+            "default": 0,
+            "description": "Average rating",
+            "format": "float",
+            "type": "number"
+          },
+          "dislike_count": {
+            "default": 0,
+            "description": "Number of dislikes",
+            "type": "integer"
+          },
+          "film_id": {
+            "description": "ID of the film",
+            "type": "string"
+          },
+          "like_count": {
+            "default": 0,
+            "description": "Number of likes",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "FilmReviewListResponse": {
+      "description": "Ok",
+      "schema": {
+        "properties": {
+          "film_id": {
+            "description": "ID of the film",
+            "type": "string"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/responses/FilmReviewResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "FilmReviewRatingResponse": {
+      "description": "Ok",
+      "schema": {
+        "properties": {
+          "avg_rating": {
+            "default": 0,
+            "description": "Average rating",
+            "format": "float",
+            "type": "number"
+          },
+          "dislike_count": {
+            "default": 0,
+            "description": "Number of dislikes",
+            "type": "integer"
+          },
+          "like_count": {
+            "default": 0,
+            "description": "Number of likes",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "FilmReviewResponse": {
+      "description": "Ok",
+      "schema": {
+        "properties": {
+          "rating": {
+            "$ref": "#/responses/FilmReviewRatingResponse"
+          },
+          "review_id": {
+            "description": "ID of the review",
+            "type": "string"
+          },
+          "value": {
+            "description": "Review value",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "InternalServerError": {
+      "description": "Internal Server Error",
+      "schema": {
+        "properties": {
+          "error": {
+            "enum": [
+              "Internal server error"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "NotFound": {
+      "description": "Not Found",
+      "schema": {
+        "properties": {
+          "error": {
+            "enum": [
+              "Resource not found"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "Unauthorized": {
+      "description": "Unauthorized",
+      "schema": {
+        "properties": {
+          "error": {
+            "enum": [
+              "Unauthorized. Bearer token not specified or invalid"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "UnprocessableContent": {
+      "description": "Unprocessable Content",
+      "schema": {
+        "properties": {
+          "errors": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "UserBookmarkResponse": {
+      "description": "Ok",
+      "schema": {
+        "properties": {
+          "created_at": {
+            "description": "Timestamp indicating when the bookmark was created",
+            "format": "int64",
+            "type": "integer"
+          },
+          "film_id": {
+            "description": "ID of the bookmarked film",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "UserBookmarkResponseList": {
+      "description": "Ok",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/responses/UserBookmarkResponse"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  },
+  "swagger": "2.0"
+}

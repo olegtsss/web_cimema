@@ -1,0 +1,35 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+header Компонентная диаграмма разрабатываемого продукта
+title Связи между сервисами
+footer Страница 1 из 1
+
+actor Клиент
+actor Администратор
+actor Аналитик
+
+component Admin as "Сервис администрирования"
+component Auth as "Сервис авторизации"
+component Etl as "Сервис полнотекстового поиска"
+component  Practix as "Сервис работы api кинотеатра"
+component Kafka as "Сервис стриминга событий"
+database Clickhouse as "Сервис Big Data"
+database Postgres as "Сервис базы данных"
+
+Клиент -down-> Practix: Работа с сайтом
+Клиент -left-> Auth: авторизация
+Администратор -down-> Admin: Работа с админкой
+
+Practix -down-> Etl: полнотекстовый поиск
+Etl <-down- Postgres: загрузка данных
+Auth -down-> Postgres
+Admin -left-> Postgres
+
+Клиент -right-> Kafka: отправка событий
+Kafka -down-> Clickhouse: сохрание в базу данных
+Clickhouse -down-> Аналитик : сбор \n обработка \n визуализация \n интерпретация
+
+@enduml

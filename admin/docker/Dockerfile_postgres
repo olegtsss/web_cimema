@@ -1,0 +1,6 @@
+FROM postgres:13
+
+# Замечание не стоит хардкодить пароли - пользуйтесть возможностью использования .env
+ENV POSTGRES_PASSWORD 123qwe
+ENV POSTGRES_USER app
+ENV POSTGRES_DB movies_database

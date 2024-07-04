@@ -1,0 +1,29 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+title С3 UGC diagram
+
+actor User
+actor AnalystUser
+
+
+package UGC {
+  component APIWebFramework
+  database OLTPStorage
+  component UGCETL
+  database OLAPStorage
+}
+
+
+User -down-> APIWebFramework : Manage gc
+AnalystUser -right-> OLAPStorage : Get users gc
+
+APIWebFramework -down-> OLTPStorage: Load UGC
+
+UGCETL -down-> OLTPStorage : Get UGC
+UGCETL --> UGCETL: Transform UGC
+UGCETL -down-> OLAPStorage : Load transformed UGC
+
+@enduml

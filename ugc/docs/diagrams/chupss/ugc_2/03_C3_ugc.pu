@@ -1,0 +1,37 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+title С3 UGC diagram
+
+actor User
+actor AnalystUser
+
+
+package UGC {
+  component APIWebFramework
+  database OLTPStorage
+  component OLAPETL
+  database OLAPStorage
+  component NoSQLETL
+  database NoSQLStorage
+}
+
+
+User -down-> APIWebFramework : Manage generated content
+AnalystUser -left-> OLAPStorage : Analysis of generated content
+
+APIWebFramework -down-> OLTPStorage: Load UGC
+
+OLAPETL -down-> OLTPStorage : Get UGC
+OLAPETL --> OLAPETL: Transform UGC
+OLAPETL -down-> OLAPStorage : Load transformed UGC
+
+NoSQLETL -down-> OLTPStorage : Get UGC
+NoSQLETL --> NoSQLETL: Transform UGC
+NoSQLETL --> NoSQLStorage: Load UGC
+APIWebFramework -right-> NoSQLStorage
+
+
+@enduml

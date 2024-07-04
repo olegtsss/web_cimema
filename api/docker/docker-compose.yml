@@ -1,0 +1,54 @@
+version: "3"
+
+name: "api_practix"
+
+volumes:
+  redis_data:
+
+services:
+  practix_redis:
+    container_name: practix_redis
+    image: redis:7
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  practix:
+    container_name: practix
+    image: practix:latest
+    build:
+      context: ../src
+      dockerfile: Dockerfile
+    env_file:
+      - ../.env
+    entrypoint: sh -c "sleep 10 && gunicorn main:app -c gunicorn.conf.py"
+
+  practix_nginx:
+    container_name: practix_nginx
+    image: nginx:1.25
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/practix.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8080:80
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - practix
+
+  practix_jaeger:
+    container_name: practix_jaeger
+    image: jaegertracing/all-in-one:1.20
+    ports:
+      - 16686:16686
+    depends_on:
+      - practix_nginx

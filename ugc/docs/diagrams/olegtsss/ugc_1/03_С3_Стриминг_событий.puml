@@ -1,0 +1,22 @@
+@startuml
+
+header Диаграмма последовательности data analyze
+title UGC
+footer Страница 1 из 1
+
+participant         Flask
+participant         Kafka
+participant         Etl
+database            Clickhouse
+
+[-> Flask : События url: \n1) user_id \n2) access_token \n3) время
+[-> Flask : События страницы: \n1) user_id \n2) access_token \n3) url \n4) id \n5) payload \n6) время
+[-> Flask : События плеера: \n1) user_id \n2) access_token \n3) url \n4) player_event_type \n5) player_event_payload \n6) время
+Flask -> Kafka : загрузка в топик \nuser
+Flask -> Kafka : загрузка в топик \nweb_content
+Flask -> Kafka : загрузка в топик \nvideo_content
+Kafka -> Etl : выгрузка из топиков
+Etl -> Clickhouse : extract \ntransform \nload
+Clickhouse ->]
+
+@enduml

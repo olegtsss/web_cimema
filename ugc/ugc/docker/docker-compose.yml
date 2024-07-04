@@ -1,0 +1,42 @@
+volumes:
+  static_files:
+
+services:
+  ugc:
+    container_name: ugc
+    image: ugc:latest
+    build:
+      context: ../src
+      dockerfile: Dockerfile
+    volumes:
+      - static_files:/opt/ugc/static
+    env_file:
+      - ../.env
+    entrypoint: sh -c "gunicorn wsgi:app -c gunicorn.conf.py"
+
+  ugc_nginx:
+    container_name: ugc_nginx
+    image: nginx:1.25
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/ugc.conf:/etc/nginx/conf.d/default.conf
+      - static_files:/var/www/ugc/static
+      - /tmp/logs/nginx/:/var/log/nginx/
+    ports:
+      - 8080:80
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - ugc
+
+  ugc_filebeat:
+    image: elastic/filebeat:8.10.2
+    volumes:
+      - /tmp/logs/nginx/:/var/log/nginx/:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+    depends_on:
+      - ugc_nginx

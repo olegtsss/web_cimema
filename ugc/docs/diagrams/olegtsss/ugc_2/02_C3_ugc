@@ -1,0 +1,80 @@
+@startuml
+
+header Диаграмма последовательности
+title UGC 2
+footer Страница 1 из 1
+
+== Оценить фильм ==
+Пользователь -> Frontend: поставить оценку
+Frontend -> Flask: POST api/v1/route_1
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: загрузка в хранилище
+Etl -> Clickhouse: загрузка в хранилище
+
+Пользователь -> Frontend: изменить оценку
+Frontend -> Flask: PUT api/v1/route_1
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: изменение оценки в хранилище
+Etl -> Clickhouse: загрузка новой оценки в хранилище
+
+Пользователь -> Frontend: узнать поставленную ранее оценку
+Frontend -> Flask: GET api/v1/route_1
+Flask -> MongoDB: получить созданную ранее оценку
+MongoDB -> Flask: оценка фильма
+Flask -> Frontend: оценка
+Frontend -> Пользователь: отобразить оценку
+
+Пользователь -> Frontend: узнать среднюю оценку
+Frontend -> Flask: GET api/v1/route_2
+Flask -> MongoDB: получить среднюю оценку
+MongoDB -> Flask: оценка фильма
+Flask -> Frontend: оценка
+Frontend -> Пользователь: отобразить среднюю оценку
+
+== Написать рецензию ==
+Пользователь -> Frontend: оставить рецензию
+Frontend -> Flask: POST api/v1/route_3
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: загрузка в хранилище
+Etl -> Clickhouse: загрузка в хранилище
+
+Пользователь -> Frontend: изменить рецензию
+Frontend -> Flask: PUT api/v1/route_3
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: изменение рецензии в хранилище
+Etl -> Clickhouse: загрузка новой рецензии в хранилище
+
+Пользователь -> Frontend: запросить оставленную ранее рецензию
+Frontend -> Flask: GET api/v1/route_3
+Flask -> MongoDB: получить созданную ранее рецензию
+MongoDB -> Flask: рецензия
+Flask -> Frontend: рецензия
+Frontend -> Пользователь: отобразить рецензию
+
+== Отложить фильм ==
+Пользователь -> Frontend: отложить фильм
+Frontend -> Flask: POST api/v1/route_4
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: загрузка в хранилище
+Etl -> Clickhouse: загрузка в хранилище
+
+Пользователь -> Frontend: убрать из закладок
+Frontend -> Flask: DELETE api/v1/route_4
+Flask -> Kafka: отправка в очередь
+Kafka -> Etl: получение сообщений \nиз очереди
+Etl -> MongoDB: убрать из закладок в хранилище
+Etl -> Clickhouse: загрузка действия в хранилище
+
+Пользователь -> Frontend: запросить закладки
+Frontend -> Flask: GET api/v1/route_4
+Flask -> MongoDB: получить закладки
+MongoDB -> Flask: фильмы в закладках
+Flask -> Frontend: фильмы в закладках
+Frontend -> Пользователь: отобразить фильмы в закладках
+
+@enduml

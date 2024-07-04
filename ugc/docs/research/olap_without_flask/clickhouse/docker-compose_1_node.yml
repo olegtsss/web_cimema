@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  zookeeper:
+    image: zookeeper:3.8
+    container_name: zookeeper
+    hostname: zookeeper
+
+  clickhouse-node:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node
+    hostname: clickhouse-node
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./data/node1:/etc/clickhouse-server
+    depends_on:
+      - zookeeper

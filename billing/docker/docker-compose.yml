@@ -1,0 +1,60 @@
+volumes:
+  pg_volume:
+  rd_volume:
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    env_file: ../.env
+    volumes:
+      - pg_volume:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7
+    container_name: redis
+    env_file: ../.env
+    volumes:
+      - rd_volume:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  billing:
+    image: python:3.10
+    container_name: billing
+    working_dir: /opt/billing
+    env_file: ../.env
+    volumes:
+      - ../src:/opt/billing
+    entrypoint: >
+      bash -c "pip install -r requirements.txt && gunicorn main:app -c gunicorn.conf.py"
+    depends_on:
+      - postgres
+      - redis
+    
+  nginx:
+    container_name: nginx
+    image: nginx:1.25
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/billing.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8000:80
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - billing

@@ -1,0 +1,9 @@
+@startuml
+
+participant Sheduler
+participant YaPay
+
+Sheduler -> YaPay : Give me an order status
+YaPay -> Sheduler : Here you are
+
+@enduml

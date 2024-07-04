@@ -1,0 +1,45 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+header Диаграмма последовательности сервиса
+title Billing Service
+footer Страница 1 из 1
+
+== Order (Subscription аналогично) ==
+Клиент -> Billing: Создание Order\n(оплата через Yookassa)
+Billing -> Yookassa: Запроос payment_link
+Billing <- Yookassa: Отправка payment_link
+Billing -> Postgres: Создание Order (ссылка на Plan)
+Клиент <- Billing: Отправка payment_link
+Billing -> Eventbus: Создание события ожидания оплаты
+Клиент -> Yookassa: Оплата через payment_link
+
+alt callback об оплате
+    Billing <- Yookassa: Callback об оплате
+    Billing -> Postgres: Создание Payment,\nактивация Order
+end
+
+== Eventbus ==
+Billing -> Eventbus: Получить все события ожидания оплаты
+Billing <- Eventbus: Orders, ожидающие оплаты
+Billing -> Postgres: активирован ли Order
+alt Order не активирован и срок его не вышел
+    Billing -> Yookassa: Оплачен ли Order
+    alt Order оплачен
+        Billing -> Postgres: Создание Payment,\nактивация Order
+    else Order не оплачен
+        Billing -> Eventbus: Возврат события ожидания оплаты
+    end
+end
+
+== Refund ==
+Клиент -> Billing: Возрат денег за Order
+Billing -> Postgres: Получение информациии по Order
+Billing -> Yookassa: Инициализация возврата
+Клиент <- Billing: Уведомление о предстоящем возврате
+Billing -> Postgres: Изменение информациии по Order,\nсоздание Refund
+Клиент <- Yookassa: Возрат денег
+
+@enduml

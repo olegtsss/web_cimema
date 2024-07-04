@@ -1,0 +1,63 @@
+version: "3"
+name: "auth"
+
+volumes:
+  pg_data:
+  redis_data:
+
+services:
+  auth_pg:
+    container_name: auth_pg
+    image: postgres:15
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  auth_redis:
+    container_name: auth_redis
+    image: redis:7
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  auth:
+    container_name: auth
+    image: auth:latest
+    build:
+      context: ../src
+      dockerfile: Dockerfile
+    env_file:
+      - ../.env
+    entrypoint: sh -c "sleep 10 && alembic upgrade head && gunicorn main:app -c gunicorn.conf.py"
+    depends_on:
+      - auth_pg
+      - auth_redis
+
+  auth_nginx:
+    container_name: auth_nginx
+    image: nginx:1.25
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/auth.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8000:80
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - auth

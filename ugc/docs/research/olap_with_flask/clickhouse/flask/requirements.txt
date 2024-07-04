@@ -1,0 +1,4 @@
+clickhouse-driver==0.2.7
+flask==2.0.2
+werkzeug==2.0.2
+gunicorn==21.2.0

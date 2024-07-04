@@ -1,0 +1,24 @@
+@startuml
+
+header Компонентная диаграмма data analyze
+title UGC
+footer Страница 1 из 1
+
+actor               Пользователь
+participant         Frontend
+participant         Api
+participant         EventBus
+participant         Etl
+database            Olap
+actor               Аналитик
+
+Пользователь <-> Frontend
+Frontend -> Api : Клики
+Frontend -> Api : Плеер
+Frontend -> Api : Url
+Api -> EventBus : Загрузка
+EventBus -> Etl : Выгрузка
+Etl -> Olap : Extract \nTransform \nLoad
+Olap <-> Аналитик
+
+@enduml

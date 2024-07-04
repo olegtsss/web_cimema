@@ -1,0 +1,48 @@
+@startuml
+
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+header Компонентная диаграмма сервиса Notification
+title Компонентная диаграмма сервиса Notification
+footer Страница 1 из 1
+
+actor Клиент
+component API
+component Worker1 as "StorageSaver"
+component Audience
+component Sheduler
+component Worker2 as "NotificationSender"
+database Storage
+queue Queue1 as "Notification queue"
+queue Queue2 as "Notification status queue"
+queue Queue4 as "Instant notification queue"
+queue Queue5 as "Scheduled notification queue"
+
+Клиент -right-> API
+
+API -right-> Queue1
+
+Worker1 -up-> Queue1
+Worker1 -up-> Queue2
+Worker1 -down-> Storage
+
+Audience -left-> Queue1
+Audience -right-> Queue4
+Audience -right-> Queue5
+Audience -down-> Queue2
+
+Sheduler -left-> Queue5
+Sheduler -right-> Queue4
+Sheduler -down-> Queue2
+
+Worker2 -left-> Queue4
+Worker2 -down-> Queue2
+
+note top of Клиент
+    - Генератор событий
+    - Админка
+    - Внутренние микросервисы, например Auth
+end note
+
+@enduml
