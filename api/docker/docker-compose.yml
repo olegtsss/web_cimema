@@ -1,13 +1,13 @@
 version: "3"
 
-name: "api_practix"
+name: "api"
 
 volumes:
   redis_data:
 
 services:
-  practix_redis:
-    container_name: practix_redis
+  redis:
+    container_name: redis
     image: redis:7
     volumes:
       - redis_data:/data
@@ -18,9 +18,9 @@ services:
       retries: 5
       start_period: 10s
 
-  practix:
-    container_name: practix
-    image: practix:latest
+  api:
+    container_name: api
+    image: api:latest
     build:
       context: ../src
       dockerfile: Dockerfile
@@ -28,8 +28,8 @@ services:
       - ../.env
     entrypoint: sh -c "sleep 10 && gunicorn main:app -c gunicorn.conf.py"
 
-  practix_nginx:
-    container_name: practix_nginx
+  nginx:
+    container_name: nginx
     image: nginx:1.25
     volumes:
       - ../nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -43,12 +43,12 @@ services:
       retries: 5
       start_period: 10s
     depends_on:
-      - practix
+      - api
 
-  practix_jaeger:
-    container_name: practix_jaeger
+  jaeger:
+    container_name: jaeger
     image: jaegertracing/all-in-one:1.20
     ports:
       - 16686:16686
     depends_on:
-      - practix_nginx
+      - nginx
